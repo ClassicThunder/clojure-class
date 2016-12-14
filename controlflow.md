@@ -4,7 +4,7 @@
 
 In clojure everything not ```false``` or ```nil``` is ```true```.
 
-**Things that resolve to ```true```**
+Things that resolve to ```true```.
 
 ```clojure
 true
@@ -14,11 +14,27 @@ true
 {:key 10}
 ```
 
-**Things that resolve to ```false```**
+Things that resolve to ```false```.
 
 ```clojure
 false
 nil
+```
+
+For Example:
+
+```clojure
+(if [1 2 3 4]
+  (println "true")
+  (println "false"))
+  
+(if "boo"
+  (println "true")
+  (println "false"))
+  
+(if nil
+  (println "true")
+  (println "false"))  
 ```
 
 ## If Statments
@@ -189,7 +205,7 @@ Basicaly a switch statment
 
 If none of the cases match and there is no defualt statment then a ```IllegalArgumentException``` is thrown
 
-```
+```clojure
 (let [s "Sonic"]
   (case s
         ("Mario" "Bowser" "Toad" "Peach") "s is a Mario character"
@@ -219,3 +235,61 @@ Test constants can by any type
 
 ## Loop Recur While
 
+Conditional based iteration is much less common in Clojure than other languages. Typically you will want to be applying transformations to data. Conditional based iteration is typically used when generating data or interacting with external state. 
+
+### Loop Recur 
+
+The Loop Recur combo results in a tail-call optimized recursive loop (only a single stack is needed). 
+
+When recur is not called the recursion falls through and the last expression is returned as the value. 
+
+```clojure
+(loop [x 0]
+  (if (>= x 10)
+    (do
+      (println x)
+      x) ; 10 is the value returned from the loop
+    (do
+      (println x)
+      (recur (+ x 1)))))
+```
+
+Loop can take multiple bindings and when it does recur needs to match the number of parameters. 
+
+```clojure
+(loop [x 0
+       numbers []]
+  (let [incriment (+ x 1)
+        aggregate (conj numbers incriment)]
+    (if (>= x 10)
+      numbers
+      (recur incriment aggregate))))
+```
+
+**Find a couple of loop recur excersizes**
+
+## While 
+
+While is very similar whiles in any other language. 
+
+```clojure
+(def x 0)
+
+(while (<= x 10) 
+  (println x)
+  (def x (+ x 1)))
+```
+
+While requires in place state changes. In the above example x has to change, where as in loop recur you pass in new information each iteration. Because of this while is more appropiate when interacting external state full systems such as file streams or database cursors. 
+
+For example:
+
+```clojure
+(defn md5-file [file]
+  (let [sha (MessageDigest/getInstance "SHA-256")]                    
+    (with-open [dis (DigestInputStream. (io/input-stream file) sha)]  
+      (while (> (.read dis) -1)))                                     
+    (DatatypeConverter/printHexBinary (.digest sha))))                
+
+(md5-file (File. "/etc/hosts"))
+```
