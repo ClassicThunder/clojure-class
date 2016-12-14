@@ -1,295 +1,1 @@
-# Control Flow
-
-## A bit about booleans
-
-In clojure everything not ```false``` or ```nil``` is ```true```.
-
-Things that resolve to ```true```.
-
-```clojure
-true
-"Hello"
-42
-[1 2 3 4]
-{:key 10}
-```
-
-Things that resolve to ```false```.
-
-```clojure
-false
-nil
-```
-
-For Example:
-
-```clojure
-(if [1 2 3 4]
-  (println "true")
-  (println "false"))
-  
-(if "boo"
-  (println "true")
-  (println "false"))
-  
-(if nil
-  (println "true")
-  (println "false"))  
-```
-
-## If Statments
-
-### if
-
-```clojure
-(if true
-  (println "This is always printed")
-  (println "This is never printed"))
-```
-
-### if-not
-
-```clojure
-(if-not true
-  (println "This is never printed")
-  (println "This is always printed"))
-```
-
-### if-let
-
-```clojure
-(if-let [x true]
-  (println "x = " x)
-  (println "x = x"))
-
-(if-let [x nil]
-  (println "x has value")
-  (println "x is nil"))
-```
-
-```clojure
-(if-let [x true]
-  (println "x = " x))
-
-(if-let [x nil]
-  (println "x has value"))
-```
-
-if-let is very usefull for interacting with optional data
-
-```clojure
-(seq (filter odd? [2 4 6 8]))
-(if-let [x (seq (filter odd? [2 4 6 8]))]
-  (println "Odd numbers " x)
-  (println "x is nil"))
-
-(seq (filter odd? [2 3 4 6 8 9]))
-(if-let [x (seq (filter odd? [2 3 4 6 8 9]))]
-  (println "Odd numbers " x)
-  (println "x is nil"))
-```
-
-### Do
-
-Sometimes you want to perform for than one expression in your if statment. Clojure has the do expression is evaluates all enclosed expression and returns the value of the last one. 
-
-```clojure
-(println "Print this first")
-(println "and then print this")
-```
-
-```clojure
-(if true
-  (println "Print this first")
-  (println "and then print this"))
-```
-
-```clojure
-(if true
-  (do 
-    (println "Print this first")
-    (println "and then print this")))
-```
-
-## When Statments
-
-When is a macro for ```if do```, the first parameters is evaluated and if true then all of the other paramiters are executed. 
-
-
-### when
-
-```clojure
-(macroexpand '(when 1 2 3 4))
-(macroexpand '(when true 
-                (println "Print this first") 
-                (println "and then print this")))
-```
-
-### when-not
-
-```clojure
-(when-not false
-  (println "statment 1")
-  (println "statment 2"))
-  
-(macroexpand '(when false 
-                (println "statment 1")
-                (println "statment 2")))
-```
-
-### when-let
-
-```clojure
-(when-let [x (seq (filter odd? [1 2 4 5 6 8]))]
-  (println "Odd numbers " x)
-  (println "And this is also printed"))
-  
-(when-let [x (seq (filter odd? [2 4 6 8]))]
-  (println "Odd numbers " x)
-  (println "And this is also printed"))
-```
-
-## Cond Case
-
-### Cond
-
-Cond takes in an arbriraty number of expression pairs. The first expression is the true/false conditional, which when true causese the second expression to be evaluated and returned. As soon as cond finds a match it evaluates the epression and returns. 
-
-```clojure
-(let [x 15]
-	(cond
-		(<= x 10) (println "equal to or less than 10")
-		(> x 10) (println "greater than 10")))
-		
-(let [x 5]
-	(cond
-		(<= x 10) (println "equal to or less than 10")
-		(> x 10) (println "greater than 10")))
-```
-
-Statments can fall through
-
-```clojure
-(let [x 10]
-	(cond
-		(< x 10) (println "equal to or less than")
-		(> x 10) (println "greater than")))
-```
-
-Cond short circuits
-
-```clojure
-(let [x 5]
-	(cond
-		(< x 15) (println "less than 15")
-		(< x 10) (println "less than 10")))
-```
-
-### Case
-
-Basicaly a switch statment
-
-```clojure
-(let [s "Mario"]
-  (case s
-        "Mario" "s = Mario"
-        "Bowser" "s = Bowser"
-        "no case for s")) ; Optional
-
-(let [s "Toad"]
-  (case s
-        "Mario" "s = Mario"
-        "Bowser" "s = Bowser"
-        "no case for s")) ; Optional
-```
-
-If none of the cases match and there is no defualt statment then a ```IllegalArgumentException``` is thrown
-
-```clojure
-(let [s "Sonic"]
-  (case s
-        ("Mario" "Bowser" "Toad" "Peach") "s is a Mario character"
-        ("Donkey" "Dixie" "Diddy") "s is a Kong"))
-```
-
-The test constants can be a list of options
-
-```clojure
-(let [s "Diddy"]
-  (case s
-        ("Mario" "Bowser" "Toad" "Peach") "s is a Mario character"
-        ("Donkey" "Dixie" "Diddy") "s is a Kong"
-        "default")) ; Optional
-```
-
-Test constants can by any type
-
-```clojure
-(let [s 10]
-  (case s
-        ("Mario" "Bowser" "Toad" "Peach") "s is a Mario character"
-        ("Donkey" "Dixie" "Diddy") "s is a Kong"
-        (1 5 10 12 ) "s is a number"
-        "default")) ; Optional
-```
-
-## Loop Recur While
-
-Conditional based iteration is much less common in Clojure than other languages. Typically you will want to be applying transformations to data. Conditional based iteration is typically used when generating data or interacting with external state. 
-
-### Loop Recur 
-
-The Loop Recur combo results in a tail-call optimized recursive loop (only a single stack is needed). 
-
-When recur is not called the recursion falls through and the last expression is returned as the value. 
-
-```clojure
-(loop [x 0]
-  (if (>= x 10)
-    (do
-      (println x)
-      x) ; 10 is the value returned from the loop
-    (do
-      (println x)
-      (recur (+ x 1)))))
-```
-
-Loop can take multiple bindings and when it does recur needs to match the number of parameters. 
-
-```clojure
-(loop [x 0
-       numbers []]
-  (let [incriment (+ x 1)
-        aggregate (conj numbers incriment)]
-    (if (>= x 10)
-      numbers
-      (recur incriment aggregate))))
-```
-
-**Find a couple of loop recur excersizes**
-
-## While 
-
-While is very similar whiles in any other language. 
-
-```clojure
-(def x 0)
-
-(while (<= x 10) 
-  (println x)
-  (def x (+ x 1)))
-```
-
-While requires in place state changes. In the above example x has to change, where as in loop recur you pass in new information each iteration. Because of this while is more appropiate when interacting external state full systems such as file streams or database cursors. 
-
-For example:
-
-```clojure
-(defn md5-file [file]
-  (let [sha (MessageDigest/getInstance "SHA-256")]                    
-    (with-open [dis (DigestInputStream. (io/input-stream file) sha)]  
-      (while (> (.read dis) -1)))                                     
-    (DatatypeConverter/printHexBinary (.digest sha))))                
-
-(md5-file (File. "/etc/hosts"))
-```
+# Control Flow## A bit about BooleansIn Clojure everything not ```false``` or ```nil``` is ```true```.Things that resolve to ```true```.```clojuretrue"Hello"42[1 2 3 4]{:key 10}```Things that resolve to ```false```.```clojurefalsenil```For Example:```clojure(if [1 2 3 4]  (println "true")  (println "false"))  (if "boo"  (println "true")  (println "false"))  (if nil  (println "true")  (println "false"))  ```## If Statements### if```clojure(if true  (println "This is always printed")  (println "This is never printed"))```### if-not```clojure(if-not true  (println "This is never printed")  (println "This is always printed"))```### if-let```clojure(if-let [x true]  (println "x = " x)  (println "x = x"))(if-let [x nil]  (println "x has value")  (println "x is nil"))``````clojure(if-let [x true]  (println "x = " x))(if-let [x nil]  (println "x has value"))```if-let is very useful for interacting with optional data```clojure(seq (filter odd? [2 4 6 8]))(if-let [x (seq (filter odd? [2 4 6 8]))]  (println "Odd numbers " x)  (println "x is nil"))(seq (filter odd? [2 3 4 6 8 9]))(if-let [x (seq (filter odd? [2 3 4 6 8 9]))]  (println "Odd numbers " x)  (println "x is nil"))```### DoSometimes you want to perform for than one expression in your if statement. Clojure has the do expression is evaluates all enclosed expression and returns the value of the last one. ```clojure(println "Print this first")(println "and then print this")``````clojure(if true  (println "Print this first")  (println "and then print this"))``````clojure(if true  (do     (println "Print this first")    (println "and then print this")))```## When StatementsWhen is a macro for ```if do```, the first parameters is evaluated and if true then all of the other parameters are executed. ### when```clojure(macroexpand '(when 1 2 3 4))(macroexpand '(when true                 (println "Print this first")                 (println "and then print this")))```### when-not```clojure(when-not false  (println "statment 1")  (println "statment 2"))  (macroexpand '(when false                 (println "statment 1")                (println "statment 2")))```### when-let```clojure(when-let [x (seq (filter odd? [1 2 4 5 6 8]))]  (println "Odd numbers " x)  (println "And this is also printed"))  (when-let [x (seq (filter odd? [2 4 6 8]))]  (println "Odd numbers " x)  (println "And this is also printed"))```## Cond Case### CondCond takes in an arbitrary number of expression pairs. The first expression is the true/false conditional, which when true causes the second expression to be evaluated and returned. As soon as cond finds a match it evaluates the expression and returns. ```clojure(let [x 15]	(cond		(<= x 10) (println "equal to or less than 10")		(> x 10) (println "greater than 10")))		(let [x 5]	(cond		(<= x 10) (println "equal to or less than 10")		(> x 10) (println "greater than 10")))```Statments can fall through```clojure(let [x 10]	(cond		(< x 10) (println "equal to or less than")		(> x 10) (println "greater than")))```Cond short circuits```clojure(let [x 5]	(cond		(< x 15) (println "less than 15")		(< x 10) (println "less than 10")))```### CaseBasicaly a switch statment```clojure(let [s "Mario"]  (case s        "Mario" "s = Mario"        "Bowser" "s = Bowser"        "no case for s")) ; Optional(let [s "Toad"]  (case s        "Mario" "s = Mario"        "Bowser" "s = Bowser"        "no case for s")) ; Optional```If none of the cases match and there is no default statement then a ```IllegalArgumentException``` is thrown```clojure(let [s "Sonic"]  (case s        ("Mario" "Bowser" "Toad" "Peach") "s is a Mario character"        ("Donkey" "Dixie" "Diddy") "s is a Kong"))```The test constants can be a list of options```clojure(let [s "Diddy"]  (case s        ("Mario" "Bowser" "Toad" "Peach") "s is a Mario character"        ("Donkey" "Dixie" "Diddy") "s is a Kong"        "default")) ; Optional```Test constants can by any type```clojure(let [s 10]  (case s        ("Mario" "Bowser" "Toad" "Peach") "s is a Mario character"        ("Donkey" "Dixie" "Diddy") "s is a Kong"        (1 5 10 12 ) "s is a number"        "default")) ; Optional```## Loop Recur WhileConditional based iteration is much less common in Clojure than other languages. Typically you will want to be applying transformations to data. Conditional based iteration is typically used when generating data or interacting with external state. ### Loop Recur The Loop Recur combo results in a tail-call optimized recursive loop (only a single stack is needed). When recur is not called the recursion falls through and the last expression is returned as the value. ```clojure(loop [x 0]  (if (>= x 10)    (do      (println x)      x) ; 10 is the value returned from the loop    (do      (println x)      (recur (+ x 1)))))```Loop can take multiple bindings and when it does recur needs to match the number of parameters. ```clojure(loop [x 0       numbers []]  (let [increment (+ x 1)        aggregate (conj numbers increment)]    (if (>= x 10)      numbers      (recur increment aggregate))))```**Find a couple of loop recur exercises**## While While is very similar whiles in any other language. ```clojure(def x 0)(while (<= x 10)   (println x)  (def x (+ x 1)))```While requires in place state changes. In the above example x has to change, where as in loop recur you pass in new information each iteration. Because of this while is more appropiate when interacting external state full systems such as file streams or database cursors. For example:```clojure(defn md5-file [file]  (let [sha (MessageDigest/getInstance "SHA-256")]                        (with-open [dis (DigestInputStream. (io/input-stream file) sha)]        (while (> (.read dis) -1)))                                         (DatatypeConverter/printHexBinary (.digest sha))))                (md5-file (File. "/etc/hosts"))```
