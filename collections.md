@@ -108,9 +108,13 @@ vs
 		(+ 7)))
 ```
 
-### Some String Examples
+### Some String Exercises
 
-> Thread first and last examples usng clojure.string
+```"some string exercises" -> "Some String Exercises"```
+
+```"some" "string" "exercises" -> "Some String Exercises"```
+
+```"some" "string" "exercises" -> "SOME Gnirts Exercises"```
 
 ## Back to Collections
 
