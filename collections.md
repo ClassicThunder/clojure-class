@@ -25,13 +25,13 @@
 
 Conj adds to the front of lists
 
-```
+```clojure
 (conj `(1 2 3 4) "boo")
 ```
 
 Conj adds to the rear of vectors
 
-```
+```clojure
 (conj [1 2 3 4] "boo")
 ```Due to immutable state and sequences many of the benifits of linked lists are not realized. Because of this vectors are perfered almost universially. 
 
@@ -75,4 +75,4 @@ Sets can treated as functions for a shorthand replacement of the get function
 ```clojure
 (#{4 2 1 3} 4)
 (#{4 2 1 3} 5)
-```### Map
+```### Map ```{}```Maps are Clojures bread and butter data structure.   Map literals. Hash maps are the default.```clojure{:language "Clojure"  :creator "Rich Hickey" :repl "http://www.tryclj.com/"  :docs "https://clojuredocs.org/"}```You can also explicitly specify the backing data structure.```clojure(hash-map	:language "Clojure" 	:creator "Rich Hickey"	:repl "http://www.tryclj.com/" 	:docs "https://clojuredocs.org/")``````clojure(sorted-map 	:language "Clojure" 	:creator "Rich Hickey"	:repl "http://www.tryclj.com/" 	:docs "https://clojuredocs.org/")``````clojure(array-map 	:language "Clojure" 	:creator "Rich Hickey"	:repl "http://www.tryclj.com/" 	:docs "https://clojuredocs.org/")```Maps must be key/value pairs.```clojure{:language "Clojure" :creator}``` Commonly used modification functions.(def m {:language "Clojure"         :creator "Rich Hickey"        :repl "http://www.tryclj.com/"         :docs "https://clojuredocs.org/"})```clojure(assoc m :t "leiningen") ```dissoc```clojure```merge```clojure```
